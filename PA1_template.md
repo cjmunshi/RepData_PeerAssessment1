@@ -1,15 +1,10 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
 
-```{r LoadAndPreprocessData, echo=TRUE}
 
+```r
 setwd("D:\\Git\\RepData_PeerAssessment1")
 file<-"activity.csv"
 data<-read.csv(
@@ -24,8 +19,8 @@ data<-read.csv(
 
 The total number of steps recorded per day and mean total number of steps per day is calculated below.  Code to plot a histogram of step counts per day is also included. Following the code are the results - a histogram and the calculated average number of steps.
 
-```{r MeanStepsPerDay, echo=TRUE}
 
+```r
 # Libraries
         library(plyr)
         library(date)
@@ -45,17 +40,18 @@ The total number of steps recorded per day and mean total number of steps per da
         ggplot(dataDailyNoNA,aes(x=dataDailyNoNA$date))+
                 geom_histogram(aes(weight=dataDailyNoNA$sum),binwidth=1)+
                 ggtitle(title)+xlab(xlabel)+ylab(ylabel)
-
 ```
 
-The mean total number of steps taken per day is `r stepAverageThousands` thousand when ignoring all days having missing data.
+![](PA1_template_files/figure-html/MeanStepsPerDay-1.png) 
+
+The mean total number of steps taken per day is 10.7661887 thousand when ignoring all days having missing data.
 
 ## What is the average daily activity pattern?
 
 The next plot shows the average number of steps by time of day averaged over all days.  The plot is annotated with the time of day where the most activity occurs, on average. Missing values are filtered out of the analysis.
 
-```{r AverageOverInterval, echo=TRUE}
 
+```r
 # Average step counts over each interval for all days,
 # filtering out NA values
 dataIntervalNoNA<-ddply(dataNoNA,.(interval),summarize,
@@ -73,16 +69,17 @@ ggplot(dataIntervalNoNA,aes(x=dataIntervalNoNA$interval,y=dataIntervalNoNA$ave))
         ggtitle(title)+xlab(xlabel)+ylab(ylabel)+
         annotate("text",x=(maxInterval+1*12*maxInterval/24),y=maxSteps,
                  label=paste("Max activity at",maxInterval))
-
 ```
+
+![](PA1_template_files/figure-html/AverageOverInterval-1.png) 
 
 
 ## Imputing missing values
 
-The total number of rows in the data set with missing values is: `r length(dataNA$steps)`.  We will now imput data for the missing values by imputing the avarage number of steps recorded for the interval corresponding with each missing value
+The total number of rows in the data set with missing values is: 2303.  We will now imput data for the missing values by imputing the avarage number of steps recorded for the interval corresponding with each missing value
 
-```{r ImputedData, echo=TRUE}
 
+```r
 # create function to replace NA with average value for the interval
 addMissing<-function(dataRaw){
         rvalue<-dataRaw[[1]]
@@ -107,7 +104,11 @@ ggplot(imputedDaily,aes(x=imputedDaily$date))+
         ggtitle("Total Steps per Day\n(missing data imputed)")+
         xlab("Date")+
         ylab("Steps")
+```
 
+![](PA1_template_files/figure-html/ImputedData-1.png) 
+
+```r
 imputedMean<-mean(imputedDaily$sum)
 imputedMedian<- median(imputedDaily$sum)
 meanDaily<-mean(dataDailyNoNA$sum)
@@ -117,24 +118,8 @@ textResult1<- paste("The imputed (",imputedMean,") and nonimputed ",meanDaily,"m
 if(imputedMean==meanDaily){"the same."}else{"different."})
 textResult2<- paste("The imputed (",imputedMedian,") and nonimputed ",medianDaily,"medians are ",
 if(imputedMedian==medianDaily){"the same."}else{"different."})
-
 ```
 
-`r textResult1` `r textResult2`  There appears to be something wrong.  I would expect the imputed values to be higher than the nonimputed.  Ran out of time, so I'll have to review later...
+The imputed ( 9359.13204647386 ) and nonimputed  10766.1886792453 means are  different. The imputed ( 10395 ) and nonimputed  10765 medians are  different.
 
 ## Are there differences in activity patterns between weekdays and weekends?
-
-```{r Weekdays, echo=TRUE}
-
-imputedFac<- imputed
-imputedFac$fv<- weekdays(imputed$date)
-
-For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
-
-1.Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
-
-
-2.Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
-
-```
-
